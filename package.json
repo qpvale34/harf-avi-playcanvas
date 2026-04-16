@@ -1,0 +1,14 @@
+{
+  "name": "harf-avi",
+  "version": "1.0.0",
+  "description": "3D Arapca Ogrenme Oyunu - PlayCanvas + Kenney",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "playcanvas": "^2.3.3",
+    "vite": "^6.0.0"
+  }
+}

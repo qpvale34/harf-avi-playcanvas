@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Harf Avi - PlayCanvas</title>
+<link rel="stylesheet" href="src/ui.css">
+</head><body>
+<div id="loading"><div class="spinner"></div><p id="loadText">Yukleniyor...</p></div>
+<div id="lobby" style="display:none"><h1> Harf Avi</h1><div class="sub">PlayCanvas 3D Arapca</div>
+<input id="playerName" placeholder="Adin" maxlength="15"><div class="chars">
+<div class="char sel" style="background:#e94560" onclick="selectChar(0)"></div>
+<div class="char" style="background:#667eea" onclick="selectChar(1)"></div>
+<div class="char" style="background:#96c93d" onclick="selectChar(2)"></div>
+<div class="char" style="background:#f5a623" onclick="selectChar(3)"></div>
+</div><button class="btn-start" onclick="startGame()"> Baslat</button></div>
+<div id="hud" style="display:none">
+<div><div class="stat"> <b id="hLetters">0</b>/<span id="hTotal">14</span></div>
+<div class="stat"> <b id="hGold">0</b></div>
+<div class="stat" id="hMap">Harita 1</div></div>
+<div class="stat">1 Oyuncu</div></div>
+<div id="joystickZone"></div>
+<div id="collectBtn" onclick="collectNearby()" style="display:none"> </div>
+<div id="letterInfo" style="display:none"><div class="big-letter" id="liChar"></div>
+<div class="letter-name" id="liName"></div><div class="letter-sound" id="liSound"></div>
+<div class="letter-detail" id="liDetail"></div><button onclick="closeLetterInfo()">Devam</button></div>
+<div id="chestInfo" style="display:none"><div style="font-size:5em"></div>
+<div style="font-size:2em;color:#FFD700;margin:10px 0" id="ciGold"></div>
+<button onclick="closeChestInfo()">Topla!</button></div>
+<div id="portalMsg" style="display:none"><h2> Portal Acildi!</h2><p>2. Haritaya geciyorsun...</p></div>
+<div id="gameOver" style="display:none"><h1>Oyun Bitti!</h1><p id="goScore"></p>
+<button class="btn-start" onclick="location.reload()">Tekrar Oyna</button></div>
+<canvas id="application-canvas"></canvas>
+<script type="module" src="main.js"></script>
+</body></html>
