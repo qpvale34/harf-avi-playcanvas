@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Harf Avi - PlayCanvas</title>
+<title>Harf Avi - Kenney</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{overflow:hidden;background:#111;font-family:Segoe UI,sans-serif;touch-action:none;user-select:none}
-canvas#application-canvas{display:block;width:100%;height:100%}
+canvas{display:block;width:100%;height:100%}
 #loading{position:fixed;inset:0;background:#0f0c29;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;color:#fff}
 .sp{width:45px;height:45px;border:4px solid rgba(255,255,255,.2);border-top-color:#f5a623;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -29,16 +29,16 @@ canvas#application-canvas{display:block;width:100%;height:100%}
 #go{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:400;color:#fff}
 #go h1{font-size:2.5em;color:#f5a623}
 </style></head><body>
-<div id="loading"><div class="sp"></div><p style="margin-top:12px">PlayCanvas yukleniyor...</p></div>
-<div id="lobby"><h1> Harf Avi</h1><div class="sub">PlayCanvas 3D Arapca Oyunu</div>
+<div id="loading"><div class="sp"></div><p style="margin-top:12px" id="lt">Modeller yukleniyor...</p></div>
+<div id="lobby" style="display:none"><h1> Harf Avi</h1><div class="sub">Kenney 3D Arapca Oyunu</div>
 <input id="pn" placeholder="Adin" maxlength="15"><div class="chs">
 <div class="ch s" style="background:#e94560" onclick="sC(0)">⚔️</div>
 <div class="ch" style="background:#667eea" onclick="sC(1)">🔮</div>
 <div class="ch" style="background:#96c93d" onclick="sC(2)">🏹</div>
 <div class="ch" style="background:#f5a623" onclick="sC(3)">🛡️</div>
 </div><button class="bs" onclick="go()"> Baslat</button></div>
-<div id="hud"><div><div class="st"> <b id="hs">0</b>/<span id="ht">14</span></div><div class="st"> <b id="hg">0</b></div><div class="st" id="hm">Harita 1</div></div><div class="st">1 Oyuncu</div></div>
-<div id="jz"></div><div id="cb" onclick="cL()"> </div>
+<div id="hud" style="display:none"><div><div class="st"> <b id="hs">0</b>/<span id="ht">14</span></div><div class="st"> <b id="hg">0</b></div><div class="st" id="hm">Harita 1</div></div><div class="st">1 Oyuncu</div></div>
+<div id="jz"></div><div id="cb" onclick="cL()" style="display:none"> </div>
 <div id="li"><div class="bl" id="ll"></div><div class="ln" id="ln2"></div><div class="ls" id="ls2"></div><div class="ld" id="ld2"></div><button onclick="cli()">Devam</button></div>
 <div id="ci"><div style="font-size:5em"></div><div style="font-size:2em;color:#FFD700;margin:10px 0" id="cg"></div><button onclick="cci()">Topla!</button></div>
 <div id="pm"><h2> Portal Acildi!</h2><p style="margin-top:8px">2. Haritaya geciyorsun...</p></div>
@@ -47,72 +47,82 @@ canvas#application-canvas{display:block;width:100%;height:100%}
 <script src="https://cdn.jsdelivr.net/npm/playcanvas@2.3.3/build/playcanvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/dist/nipplejs.min.js"></script>
 <script>
+var BASE="https://raw.githubusercontent.com/qpvale34/harf-avi-playcanvas/main/dist/";
 var LD=[["\u0627","Elif","a","Ilk harf"],["\u0628","Be","b","B sesi"],["\u062a","Te","t","T sesi"],["\u062b","Se","s","Dil ucuyla S"],["\u062c","Cim","c","C sesi"],["\u062d","Ha","h","Bogazdan H"],["\u062e","Hi","h","Hirilti H"],["\u062f","Dal","d","D sesi"],["\u0630","Zel","z","Dil ucu Z"],["\u0631","Re","r","R sesi"],["\u0632","Ze","z","Z sesi"],["\u0633","Sin","s","S sesi"],["\u0634","Sin","\u015f","\u015f sesi"],["\u0635","Sad","s","Kalin S"],["\u0636","Dad","d","Kalin D"],["\u0637","Ta","t","Kalin T"],["\u0638","Za","z","Kalin Z"],["\u0639","Ayn","a","Bogazdan A"],["\u063a","Gayn","g","G/H"],["\u0641","Fe","f","F sesi"],["\u0642","Kaf","k","Kalin K"],["\u0643","Kef","k","K sesi"],["\u0644","Lam","l","L sesi"],["\u0645","Mim","m","M sesi"],["\u0646","Nun","n","N sesi"],["\u0647","He","h","H sesi"],["\u0648","Vav","v","V/U sesi"],["\u064a","Ye","y","Y/I sesi"]];
 var CC=[[0.91,0.27,0.38],[0.4,0.49,0.92],[0.59,0.79,0.24],[0.96,0.65,0.14]];
-var HCC=[[0.2,0.2,0.2],[0.4,0.2,0],[1,0.84,0],[0.8,0,0]];
-var app,cam,pl,joy,lms=[],col,cm=1,ok=false,si=0,gold=0,st2=0,md={x:0,y:0},pm=null,ches=[],wait=false;
-var audioCtx;
+var app,cam,pl,joy,lms=[],col,cm=1,ok=false,si=0,gold=0,st2=0,md={x:0,y:0},pm=null,ches=[],wait=false,audioCtx;
+var M={}; // loaded models
 
-// AUDIO SYSTEM
+// AUDIO
 function initAudio(){audioCtx=new(window.AudioContext||window.webkitAudioContext)()}
-function playTone(freq,dur,type,vol){
-if(!audioCtx)initAudio();
-var o=audioCtx.createOscillator();var g=audioCtx.createGain();
-o.type=type||"sine";o.frequency.value=freq;g.gain.value=vol||0.3;
-g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
-o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur)}
-function sfxCoin(){playTone(880,0.1,"sine",0.3);setTimeout(function(){playTone(1100,0.15,"sine",0.2)},80)}
-function sfxChest(){playTone(440,0.1,"square",0.2);setTimeout(function(){playTone(660,0.1,"square",0.2)},100);setTimeout(function(){playTone(880,0.2,"square",0.15)},200)}
-function sfxPortal(){playTone(330,0.3,"sine",0.2);setTimeout(function(){playTone(440,0.3,"sine",0.2)},200);setTimeout(function(){playTone(660,0.4,"sine",0.15)},400)}
-function sfxStep(){playTone(100+Math.random()*50,0.05,"triangle",0.05)}
+function tone(f,d,t,v){if(!audioCtx)return;var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t||"sine";o.frequency.value=f;g.gain.value=v||0.3;g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d)}
+function sfxCoin(){tone(880,0.1,"sine",0.3);setTimeout(function(){tone(1100,0.15,"sine",0.2)},80)}
+function sfxChest(){tone(440,0.1,"square",0.2);setTimeout(function(){tone(660,0.1,"square",0.2)},100);setTimeout(function(){tone(880,0.2,"square",0.15)},200)}
+function sfxPortal(){tone(330,0.3,"sine",0.2);setTimeout(function(){tone(440,0.3,"sine",0.2)},200);setTimeout(function(){tone(660,0.4,"sine",0.15)},400)}
+function sfxStep(){tone(100+Math.random()*50,0.05,"triangle",0.05)}
+function spk(t,l){try{if("speechSynthesis"in window){var u=new SpeechSynthesisUtterance(t);u.lang=l||"ar-SA";u.rate=0.8;speechSynthesis.speak(u)}}catch(e){}}
 
 // APP
 var cv=document.getElementById("application-canvas");
 app=new pc.Application(cv,{mouse:new pc.Mouse(cv),touch:new pc.TouchDevice(cv),keyboard:new pc.Keyboard(window)});
 app.setCanvasResolution(pc.RESOLUTION_AUTO);app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);app.start();
 
-function spk(t,l){try{if("speechSynthesis"in window){var u=new SpeechSynthesisUtterance(t);u.lang=l||"ar-SA";u.rate=0.8;speechSynthesis.speak(u)}}catch(e){}}
+// LOAD GLB MODELS
+function loadGLB(name,url){return new Promise(function(res,rej){
+var asset=new pc.Asset(name,"container",{url:url});
+app.assets.add(asset);app.assets.load(asset);
+asset.ready(function(){res(asset)});asset.on("error",function(e){rej(e)})})}
+
+var MODEL_NAMES=["character","coin","brick","flag","cloud","grass"];
+var loaded=0;
+MODEL_NAMES.forEach(function(n){var lt=document.getElementById("lt");
+loadGLB(n,BASE+n+".glb").then(function(a){M[n]=a;loaded++;lt.textContent=n+" yuklendi ("+loaded+"/"+MODEL_NAMES.length+")";if(loaded>=MODEL_NAMES.length)showLobby()}).catch(function(){loaded++;if(loaded>=MODEL_NAMES.length)showLobby()})});
+
+function showLobby(){document.getElementById("loading").style.display="none";document.getElementById("lobby").style.display="flex"}
 function sC(i){si=i;document.querySelectorAll(".ch").forEach(function(e,j){e.className=j===i?"ch s":"ch"})}
 function go(){initAudio();var nm=document.getElementById("pn").value.trim()||"Oyuncu";document.getElementById("lobby").style.display="none";document.getElementById("hud").style.display="flex";document.getElementById("cb").style.display="flex";init(nm)}
 function mt(r,g,b,er,eg,eb){var m=new pc.StandardMaterial();m.diffuse.set(r,g,b);if(er!==undefined)m.emissive.set(er,eg,eb);m.update();return m}
+function cloneModel(name){if(!M[name]||!M[name].resource)return null;return M[name].resource.instantiateRenderEntity()}
 
 function init(nm){
 ok=false;wait=false;while(app.root.children.length>0)app.root.removeChild(app.root.children[0]);
 lms=[];col=new Set();ches=[];pm=null;
 var l1=new pc.Entity();l1.addComponent("light",{type:"directional",color:new pc.Color(1,1,1),intensity:1});l1.setEulerAngles(45,30,0);app.root.addChild(l1);
 var l2=new pc.Entity();l2.addComponent("light",{type:"directional",color:new pc.Color(0.7,0.7,0.9),intensity:0.4});l2.setEulerAngles(-30,60,0);app.root.addChild(l2);
-// Hemisphere light for ambient
-var l3=new pc.Entity();l3.addComponent("light",{type:"directional",color:new pc.Color(0.4,0.5,0.4),intensity:0.3});l3.setEulerAngles(-90,0,0);app.root.addChild(l3);
 cam=new pc.Entity();cam.addComponent("camera",{clearColor:new pc.Color(0.53,0.81,0.92),fov:55});cam.setPosition(0,25,20);cam.lookAt(0,0,0);app.root.addChild(cam);
 var sz=cm===1?60:90;
 var g=new pc.Entity();g.addComponent("model",{type:"plane"});g.setLocalScale(sz,1,sz);g.model.material=mt(0.3,0.5,0.25);app.root.addChild(g);
 var wm=mt(0.45,0.35,0.25),h=sz/2;
 [[0,2,-h,sz,4,1],[0,2,h,sz,4,1],[-h,2,0,1,4,sz],[h,2,0,1,4,sz]].forEach(function(w){var b=new pc.Entity();b.addComponent("model",{type:"box"});b.setLocalScale(w[3],w[4],w[5]);b.setPosition(w[0],w[1],w[2]);b.model.material=wm;app.root.addChild(b)});
-for(var i=0;i<12;i++){var a=Math.random()*6.28,r=sz*0.35+Math.random()*5,x=Math.cos(a)*r,z=Math.sin(a)*r;
-var tk=new pc.Entity();tk.addComponent("model",{type:"cylinder"});tk.setLocalScale(0.3,2,0.3);tk.setPosition(x,1,z);tk.model.material=mt(0.54,0.27,0.07);app.root.addChild(tk);
-var lf=new pc.Entity();lf.addComponent("model",{type:"cone"});var s=1+Math.random()*0.5;lf.setLocalScale(s*1.5,s*1.5,s*1.5);lf.setPosition(x,2.5,z);lf.model.material=mt(0.13,0.55,0.13);app.root.addChild(lf)}
-for(var i=0;i<8;i++){var a=Math.random()*6.28,r=Math.random()*sz*0.3,rk=new pc.Entity();rk.addComponent("model",{type:"sphere"});var rs=0.4+Math.random()*0.4;rk.setLocalScale(rs,rs*0.6,rs);rk.setPosition(Math.cos(a)*r,0.3,Math.sin(a)*r);rk.model.material=mt(0.5,0.5,0.5);app.root.addChild(rk)}
-// Houses
-for(var i=0;i<2;i++){var hx=(i===0?-1:1)*(10+Math.random()*10),hz=(Math.random()-0.5)*20;
-var house=new pc.Entity();house.addComponent("model",{type:"box"});house.setLocalScale(2.5,2,2);house.setPosition(hx,1,hz);house.model.material=mt(0.82,0.71,0.55);app.root.addChild(house);
-var roof=new pc.Entity();roof.addComponent("model",{type:"cone"});roof.setLocalScale(2,1,2);roof.setPosition(hx,2.6,hz);roof.model.material=mt(0.8,0.3,0.3);app.root.addChild(roof)}
-pl=new pc.Entity();pl.addComponent("model",{type:"capsule"});pl.setLocalScale(0.6,1,0.6);pl.setPosition(0,1,0);pl.model.material=mt(CC[si][0],CC[si][1],CC[si][2]);app.root.addChild(pl);
-var hd=new pc.Entity();hd.addComponent("model",{type:"sphere"});hd.setLocalScale(0.5,0.5,0.5);hd.setPosition(0,1.2,0);hd.model.material=mt(1,0.86,0.74);pl.addChild(hd);
-[-0.12,0.12].forEach(function(x){var e=new pc.Entity();e.addComponent("model",{type:"sphere"});e.setLocalScale(0.12,0.12,0.05);e.setPosition(x,1.3,0.22);e.model.material=mt(0.1,0.1,0.1);pl.addChild(e)});
-var ht=new pc.Entity();ht.addComponent("model",{type:"cylinder"});ht.setLocalScale(0.4,0.15,0.4);ht.setPosition(0,1.55,0);ht.model.material=mt(HCC[si][0],HCC[si][1],HCC[si][2]);pl.addChild(ht);
-// Shield on back
-var sh=new pc.Entity();sh.addComponent("model",{type:"cylinder"});sh.setLocalScale(0.35,0.05,0.35);sh.setPosition(0,0.9,-0.35);sh.model.material=mt(CC[si][0]*0.7,CC[si][1]*0.7,CC[si][2]*0.7);pl.addChild(sh);
+// Kenney grass decorations
+for(var i=0;i<15;i++){var a=Math.random()*6.28,r=Math.random()*sz*0.4;
+var grass=cloneModel("grass");if(grass){grass.setPosition(Math.cos(a)*r,0,Math.sin(a)*r);var gs=0.8+Math.random()*0.4;grass.setLocalScale(gs,gs,gs);app.root.addChild(grass)}}
+// Kenney cloud decorations (floating)
+for(var i=0;i<5;i++){var cloud=cloneModel("cloud");if(cloud){
+cloud.setPosition((Math.random()-0.5)*sz,15+Math.random()*5,(Math.random()-0.5)*sz);var cs=2+Math.random()*2;cloud.setLocalScale(cs,cs,cs);cloud.userData={cloud:true,baseY:cloud.getPosition().y,fo:Math.random()*6.28};app.root.addChild(cloud)}}
+// Kenney brick obstacles
+for(var i=0;i<6;i++){var brick=cloneModel("brick");if(brick){brick.setPosition((Math.random()-0.5)*sz*0.4,0,(Math.random()-0.5)*sz*0.4);brick.setLocalScale(1.5,1.5,1.5);app.root.addChild(brick)}}
+// Player (Kenney character)
+pl=cloneModel("character");if(pl){pl.setLocalScale(1.5,1.5,1.5);pl.setPosition(0,0,0)}
+else{pl=new pc.Entity();pl.addComponent("model",{type:"capsule"});pl.setLocalScale(0.6,1,0.6);pl.setPosition(0,1,0);pl.model.material=mt(CC[si][0],CC[si][1],CC[si][2])}
+app.root.addChild(pl);
+// Color indicator on player
+var tint=new pc.Entity();tint.addComponent("model",{type:"sphere"});tint.setLocalScale(0.2,0.2,0.2);tint.setPosition(0,2.2,0);tint.model.material=mt(CC[si][0],CC[si][1],CC[si][2],0.5,0.3,0.3);pl.addChild(tint);
+// Letters (Kenney coin + letter sprite)
 var si2=cm===1?0:14,mm=sz*0.3;
 for(var i=0;i<14;i++){var idx=si2+i;if(idx>=LD.length)break;
 var e=new pc.Entity();e.addComponent("model",{type:"cylinder"});e.setLocalScale(0.8,0.1,0.8);e.model.material=mt(1,0.84,0,0.5,0.4,0);
 e.setPosition((Math.random()-0.5)*mm*2,1.5,(Math.random()-0.5)*mm*2);e.userData={li:idx,fo:Math.random()*6.28,col:false,by:1.5};
 var lt=new pc.Entity();lt.addComponent("light",{type:"point",color:new pc.Color(1,0.84,0),intensity:0.3,range:5});lt.setPosition(0,1,0);e.addChild(lt);
 app.root.addChild(e);lms.push(e)}
+// Chests (Kenney brick stack + flag)
 var cc=cm===1?3:4;
-for(var i=0;i<cc;i++){var a=Math.random()*6.28,r=Math.random()*sz*0.25+5;
-var ch=new pc.Entity();ch.addComponent("model",{type:"box"});ch.setLocalScale(1.2,0.8,0.8);ch.setPosition(Math.cos(a)*r,0.4,Math.sin(a)*r);ch.model.material=mt(0.54,0.27,0.07);app.root.addChild(ch);
+for(var i=0;i<cc;i++){var a=Math.random()*6.28,r=Math.random()*sz*0.25+5,x=Math.cos(a)*r,z=Math.sin(a)*r;
+var ch=new pc.Entity();ch.addComponent("model",{type:"box"});ch.setLocalScale(1.2,0.8,0.8);ch.setPosition(x,0.4,z);ch.model.material=mt(0.54,0.27,0.07);app.root.addChild(ch);
 var tr=new pc.Entity();tr.addComponent("model",{type:"box"});tr.setLocalScale(1.22,0.1,0.82);tr.setPosition(0,0.35,0);tr.model.material=mt(1,0.84,0,0.5,0.4,0);ch.addChild(tr);
-var cl=new pc.Entity();cl.addComponent("light",{type:"point",color:new pc.Color(1,0.84,0),intensity:0.4,range:6});cl.setPosition(0,1.5,0);ch.addChild(cl);
+// Kenney flag on chest
+var flag=cloneModel("flag");if(flag){flag.setLocalScale(0.3,0.3,0.3);flag.setPosition(0,0.8,0);ch.addChild(flag)}
+var cl2=new pc.Entity();cl2.addComponent("light",{type:"point",color:new pc.Color(1,0.84,0),intensity:0.4,range:6});cl2.setPosition(0,1.5,0);ch.addChild(cl2);
 ch.userData={chest:true,opened:false};ches.push(ch)}
 if(!joy){joy=nipplejs.create({zone:document.getElementById("jz"),mode:"static",position:{left:"70px",bottom:"70px"},color:"#f5a623",size:100,restOpacity:0.5});
 joy.on("move",function(e,d){if(!d.direction)return;var a=d.angle.radian,f=Math.min(d.force,2)/2;md.x=Math.cos(a)*f;md.y=Math.sin(a)*f});
@@ -151,12 +161,12 @@ var stepTimer=0;
 app.on("update",function(dt){if(!ok||!pl)return;
 var pp=pl.getPosition(),sz=(cm===1?60:90)/2-1,dx=md.x,dy=md.y;
 if(dx||dy){var l=Math.sqrt(dx*dx+dy*dy);dx=dx/l*8*dt;dy=dy/l*8*dt;
-pl.setPosition(Math.max(-sz,Math.min(sz,pp.x+dx)),pp.y,Math.max(-sz,Math.min(sz,pp.z-dy)));
-pl.setEulerAngles(0,Math.atan2(dx,-dy)*180/Math.PI,0);
+var nx=Math.max(-sz,Math.min(sz,pp.x+dx)),nz=Math.max(-sz,Math.min(sz,pp.z-dy));
+pl.setPosition(nx,pp.y,nz);if(pl.setEulerAngles)pl.setEulerAngles(0,Math.atan2(dx,-dy)*180/Math.PI,0);
 stepTimer+=dt;if(stepTimer>0.3){stepTimer=0;sfxStep()}}
 var cp=cam.getPosition(),tp=pl.getPosition();cp.x+=(tp.x-cp.x)*0.08;cp.z+=(tp.z+18-cp.z)*0.08;cam.setPosition(cp.x,cp.y,cp.z);cam.lookAt(tp.x,0,tp.z);
 var t=Date.now()*0.001;lms.forEach(function(e){if(e.userData.col)return;var p=e.getPosition();e.setPosition(p.x,e.userData.by+Math.sin(t*3+e.userData.fo)*0.3,p.z);e.rotate(0,120*dt,0)});
+// Animate clouds
+app.root.children.forEach(function(c){if(c.userData&&c.userData.cloud){var p=c.getPosition();c.setPosition(p.x,c.userData.baseY+Math.sin(t*0.5+c.userData.fo)*1,p.z)}});
 if(pm)pm.rotate(0,0,180*dt)});
-
-document.getElementById("loading").style.display="none";document.getElementById("lobby").style.display="flex";
 </script></body></html>
